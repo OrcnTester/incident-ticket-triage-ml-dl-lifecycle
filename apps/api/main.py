@@ -1,95 +1,54 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, Literal
 
 import joblib
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+MODEL_PATH = Path("artifacts/baseline_priority/model.joblib")
 
-APP = FastAPI(title="Incident Ticket Triage API", version="0.1.0")
+app = FastAPI(title="Incident Ticket Triage API")
 
 
 class PredictRequest(BaseModel):
-    text: str = Field(..., min_length=3)
-    system: Optional[str] = None
-    source: Optional[str] = None
-    error_code: Optional[str] = None
+    text: str = Field(..., min_length=1)
 
 
 class PredictResponse(BaseModel):
-    category: Optional[str] = None
-    priority: Optional[str] = None
-    routing_team: Optional[str] = None
-    model: str
-    note: str
+    target: str
+    label: str
+    proba: dict[str, float] | None = None
 
 
-def _load_model(path: str):
-    p = Path(path)
-    if not p.exists():
-        raise RuntimeError(f"Model not found at {p}. Train first.")
-    return joblib.load(p)
+_model = None
 
 
-# For MVP: load two separate models if you trained them
-PRIORITY_MODEL_PATH = "artifacts/baseline_priority/model.joblib"
-CATEGORY_MODEL_PATH = "artifacts/baseline_category/model.joblib"
-
-_priority_model = None
-_category_model = None
-
-
-@APP.get("/health")
-def health():
-    return {"status": "ok"}
+@app.on_event("startup")
+def load_model() -> None:
+    global _model
+    if not MODEL_PATH.exists():
+        raise RuntimeError(f"Model not found: {MODEL_PATH}. Run train_baseline first.")
+    _model = joblib.load(MODEL_PATH)
 
 
-@APP.on_event("startup")
-def startup():
-    global _priority_model, _category_model
-    # Load if present; allow running even if one missing.
-    try:
-        _priority_model = _load_model(PRIORITY_MODEL_PATH)
-    except Exception:
-        _priority_model = None
-    try:
-        _category_model = _load_model(CATEGORY_MODEL_PATH)
-    except Exception:
-        _category_model = None
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok", "model_loaded": _model is not None}
 
 
-@APP.post("/predict", response_model=PredictResponse)
-def predict(req: PredictRequest):
-    X = pd.DataFrame([{"text": req.text}])
+@app.post("/predict", response_model=PredictResponse)
+def predict(req: PredictRequest) -> PredictResponse:
+    if _model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
 
-    priority = None
-    category = None
+    X = pd.DataFrame({"text": [req.text]})
+    label = str(_model.predict(X)[0])
 
-    if _priority_model is not None:
-        priority = str(_priority_model.predict(X)[0])
+    proba = None
+    if hasattr(_model, "predict_proba") and hasattr(_model, "classes_"):
+        probs = _model.predict_proba(X)[0]
+        proba = {str(c): float(p) for c, p in zip(_model.classes_, probs)}
 
-    if _category_model is not None:
-        category = str(_category_model.predict(X)[0])
-
-    # MVP routing: simple mapping by category (fallback)
-    routing_map = {
-        "outage": "SRE",
-        "latency": "SRE",
-        "auth_issue": "Security",
-        "payment_issue": "Payments",
-        "data_issue": "Data",
-        "deployment_issue": "Platform",
-    }
-    routing_team = routing_map.get(category, "Triage")
-
-    note = "Train models to enable predictions. Missing model files will result in null outputs."
-    return PredictResponse(
-        category=category,
-        priority=priority,
-        routing_team=routing_team,
-        model="tfidf+logreg",
-        note=note,
-    )
+    return PredictResponse(target="priority", label=label, proba=proba)

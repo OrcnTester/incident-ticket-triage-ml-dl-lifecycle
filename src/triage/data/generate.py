@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 import random
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-
+now = datetime.now(timezone.utc)
 import pandas as pd
 
 
