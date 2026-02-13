@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 
 import joblib
-import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix, f1_score, accuracy_score
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    accuracy_score,
+    precision_score,
+    recall_score,
+)
 
 from src.triage.data.load import load_tickets
 
@@ -19,6 +25,25 @@ def load_split(path: Path) -> Optional[Dict[str, List[int]]]:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def label_distribution(labels: List[str]) -> Dict[str, Any]:
+    """
+    Returns counts + ratios for a label list.
+    """
+    n = len(labels)
+    counts: Dict[str, int] = {}
+    for y in labels:
+        counts[y] = counts.get(y, 0) + 1
+
+    ratios = {k: (v / n if n else 0.0) for k, v in counts.items()}
+    # stable ordering for readability
+    ordered_keys = sorted(counts.keys())
+    return {
+        "n": n,
+        "counts": {k: counts[k] for k in ordered_keys},
+        "ratios": {k: ratios[k] for k in ordered_keys},
+    }
 
 
 def severe_mistake_rate(y_true: List[str], y_pred: List[str]) -> float:
@@ -37,6 +62,28 @@ def severe_mistake_rate(y_true: List[str], y_pred: List[str]) -> float:
     return float(sum(sev) / len(pairs))
 
 
+def p0_recall(y_true: List[str], y_pred: List[str]) -> float:
+    """
+    Recall for class P0 treated as positive vs all others.
+    """
+    y_true_bin = [1 if y == "P0" else 0 for y in y_true]
+    y_pred_bin = [1 if y == "P0" else 0 for y in y_pred]
+    return float(recall_score(y_true_bin, y_pred_bin, zero_division=0))
+
+
+def p0p1_binary_metrics(y_true: List[str], y_pred: List[str]) -> Dict[str, Any]:
+    """
+    Binary gate metrics for "high severity": positive = {P0, P1}.
+    """
+    y_true_bin = [1 if y in ("P0", "P1") else 0 for y in y_true]
+    y_pred_bin = [1 if y in ("P0", "P1") else 0 for y in y_pred]
+
+    rec = recall_score(y_true_bin, y_pred_bin, zero_division=0)
+    prec = precision_score(y_true_bin, y_pred_bin, zero_division=0)
+    cm = confusion_matrix(y_true_bin, y_pred_bin).tolist()
+    return {"recall": float(rec), "precision": float(prec), "confusion_matrix": cm}
+
+
 def evaluate_target(
     *,
     name: str,
@@ -51,10 +98,11 @@ def evaluate_target(
     if split is None:
         raise RuntimeError(f"Missing split file: {split_path}. Train the model first.")
 
-    test_idx = split["test_idx"]
+    train_idx = split.get("train_idx", [])
+    test_idx = split.get("test_idx", [])
+
     X_test = [X[i] for i in test_idx]
     y_test = [y[i] for i in test_idx]
-
     y_pred = pipe.predict(X_test).tolist()
 
     out: Dict[str, Any] = {
@@ -66,21 +114,39 @@ def evaluate_target(
         "labels": sorted(list(set(y_test))),
         "confusion_matrix": confusion_matrix(y_test, y_pred).tolist(),
         "classification_report": classification_report(y_test, y_pred, digits=3),
+        # imbalance evidence
+        "label_distribution_test": label_distribution(y_test),
     }
+
+    # Include train distribution too (imbalance evidence)
+    if train_idx:
+        y_train = [y[i] for i in train_idx]
+        out["label_distribution_train"] = label_distribution(y_train)
+    else:
+        out["label_distribution_train"] = None
 
     if name == "priority":
         out["severe_mistake_rate"] = severe_mistake_rate(y_test, y_pred)
+        out["p0_recall"] = p0_recall(y_test, y_pred)
+        out["p0p1_binary"] = p0p1_binary_metrics(y_test, y_pred)
 
     return out
 
 
+def _fmt_dist(d: Optional[Dict[str, Any]]) -> str:
+    if not d:
+        return "n/a"
+    counts = d.get("counts", {})
+    ratios = d.get("ratios", {})
+    parts = []
+    for k in counts.keys():
+        parts.append(f"{k}:{counts[k]} ({ratios.get(k, 0.0)*100:.1f}%)")
+    return ", ".join(parts) if parts else "n/a"
+
+
 def main() -> None:
-    # Load dataset
     loaded = load_tickets("data/tickets.csv", drop_duplicates_on_text=True)
     df = loaded.df
-
-    # Build X
-    X = df[loaded.text_col].astype(str).tolist()
 
     results: Dict[str, Any] = {}
     report_lines: List[str] = []
@@ -100,9 +166,14 @@ def main() -> None:
             y=y_cat,
         )
         results["category"] = cat
+
         report_lines.append("=== CATEGORY (baseline) ===")
         report_lines.append(cat["classification_report"])
-        report_lines.append(f"macro_f1={cat['macro_f1']:.4f} weighted_f1={cat['weighted_f1']:.4f} acc={cat['accuracy']:.4f}")
+        report_lines.append(
+            f"macro_f1={cat['macro_f1']:.4f} weighted_f1={cat['weighted_f1']:.4f} acc={cat['accuracy']:.4f}"
+        )
+        report_lines.append("Label distribution (train): " + _fmt_dist(cat.get("label_distribution_train")))
+        report_lines.append("Label distribution (test):  " + _fmt_dist(cat.get("label_distribution_test")))
         report_lines.append("")
     else:
         report_lines.append("=== CATEGORY (baseline) ===")
@@ -125,12 +196,25 @@ def main() -> None:
             y=y_pr,
         )
         results["priority"] = pr
+
         report_lines.append("=== PRIORITY (baseline) ===")
         report_lines.append(pr["classification_report"])
         report_lines.append(
             f"macro_f1={pr['macro_f1']:.4f} weighted_f1={pr['weighted_f1']:.4f} acc={pr['accuracy']:.4f} "
             f"severe_mistake_rate={pr.get('severe_mistake_rate', 0.0):.4f}"
         )
+
+        # Ops-focused metrics for imbalance
+        p0r = pr.get("p0_recall", 0.0)
+        p0p1 = pr.get("p0p1_binary", {}) or {}
+        report_lines.append(
+            f"p0_recall={p0r:.4f} "
+            f"p0p1_recall={float(p0p1.get('recall', 0.0)):.4f} "
+            f"p0p1_precision={float(p0p1.get('precision', 0.0)):.4f}"
+        )
+        report_lines.append("P0/P1 confusion matrix (binary): " + str(p0p1.get("confusion_matrix")))
+        report_lines.append("Label distribution (train): " + _fmt_dist(pr.get("label_distribution_train")))
+        report_lines.append("Label distribution (test):  " + _fmt_dist(pr.get("label_distribution_test")))
         report_lines.append("")
     else:
         report_lines.append("=== PRIORITY (baseline) ===")
