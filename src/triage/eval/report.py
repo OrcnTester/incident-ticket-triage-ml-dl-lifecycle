@@ -1,66 +1,148 @@
 from __future__ import annotations
 
-import argparse
+import json
 from pathlib import Path
+from typing import Dict, Any, Optional, List
 
 import joblib
-import pandas as pd
-from sklearn.metrics import f1_score, recall_score, precision_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix, f1_score, accuracy_score
+
+from src.triage.data.load import load_tickets
+
+
+def ensure_dir(p: Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
+
+
+def load_split(path: Path) -> Optional[Dict[str, List[int]]]:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def severe_mistake_rate(y_true: List[str], y_pred: List[str]) -> float:
+    """
+    Severe mistake: |pred-true| >= 2 when mapping P0..P3 -> 0..3
+    """
+    mapping = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
+    pairs = []
+    for t, p in zip(y_true, y_pred):
+        if t not in mapping or p not in mapping:
+            continue
+        pairs.append((mapping[t], mapping[p]))
+    if not pairs:
+        return 0.0
+    sev = [1 for t, p in pairs if abs(p - t) >= 2]
+    return float(sum(sev) / len(pairs))
+
+
+def evaluate_target(
+    *,
+    name: str,
+    model_path: Path,
+    split_path: Path,
+    X: List[str],
+    y: List[str],
+) -> Dict[str, Any]:
+    pipe = joblib.load(model_path)
+    split = load_split(split_path)
+
+    if split is None:
+        raise RuntimeError(f"Missing split file: {split_path}. Train the model first.")
+
+    test_idx = split["test_idx"]
+    X_test = [X[i] for i in test_idx]
+    y_test = [y[i] for i in test_idx]
+
+    y_pred = pipe.predict(X_test).tolist()
+
+    out: Dict[str, Any] = {
+        "target": name,
+        "n_test": len(y_test),
+        "macro_f1": float(f1_score(y_test, y_pred, average="macro")),
+        "weighted_f1": float(f1_score(y_test, y_pred, average="weighted")),
+        "accuracy": float(accuracy_score(y_test, y_pred)),
+        "labels": sorted(list(set(y_test))),
+        "confusion_matrix": confusion_matrix(y_test, y_pred).tolist(),
+        "classification_report": classification_report(y_test, y_pred, digits=3),
+    }
+
+    if name == "priority":
+        out["severe_mistake_rate"] = severe_mistake_rate(y_test, y_pred)
+
+    return out
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=str, default="data/tickets.csv")
-    ap.add_argument("--model", type=str, default="artifacts/baseline_priority/model.joblib")
-    ap.add_argument("--target", type=str, choices=["priority", "category"], default="priority")
-    ap.add_argument("--test", type=float, default=0.2)
-    ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--out", type=str, default="artifacts/reports/report.txt")
-    args = ap.parse_args()
+    # Load dataset
+    loaded = load_tickets("data/tickets.csv", drop_duplicates_on_text=True)
+    df = loaded.df
 
-    df = pd.read_csv(args.data)
-    X = df[["text"]].copy()
-    y = df[args.target].astype(str)
+    # Build X
+    X = df[loaded.text_col].astype(str).tolist()
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=args.test, random_state=args.seed, stratify=y
-    )
+    results: Dict[str, Any] = {}
+    report_lines: List[str] = []
 
-    model = joblib.load(args.model)
-    preds = model.predict(X_test)
+    # CATEGORY
+    cat_dir = Path("artifacts") / "baseline_category"
+    if loaded.category_col and (cat_dir / "model.joblib").exists():
+        df_cat = df[df[loaded.category_col].notna()].copy().reset_index(drop=True)
+        X_cat = df_cat[loaded.text_col].astype(str).tolist()
+        y_cat = df_cat[loaded.category_col].astype(str).tolist()
 
-    out_path = Path(args.out)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    lines = []
-    lines.append(f"Target: {args.target}")
-    lines.append("")
-
-    if args.target == "category":
-        macro_f1 = f1_score(y_test, preds, average="macro")
-        lines.append(f"Macro F1: {macro_f1:.4f}")
+        cat = evaluate_target(
+            name="category",
+            model_path=cat_dir / "model.joblib",
+            split_path=cat_dir / "split.json",
+            X=X_cat,
+            y=y_cat,
+        )
+        results["category"] = cat
+        report_lines.append("=== CATEGORY (baseline) ===")
+        report_lines.append(cat["classification_report"])
+        report_lines.append(f"macro_f1={cat['macro_f1']:.4f} weighted_f1={cat['weighted_f1']:.4f} acc={cat['accuracy']:.4f}")
+        report_lines.append("")
     else:
-        # priority: focus on P0/P1 recall and precision
-        y_true_bin = y_test.isin(["P0", "P1"]).astype(int)
-        y_pred_bin = pd.Series(preds).isin(["P0", "P1"]).astype(int)
+        report_lines.append("=== CATEGORY (baseline) ===")
+        report_lines.append("Model not found. Train it first:")
+        report_lines.append("  python -m src.triage.models.train_baseline --target category")
+        report_lines.append("")
 
-        rec = recall_score(y_true_bin, y_pred_bin)
-        prec = precision_score(y_true_bin, y_pred_bin)
+    # PRIORITY
+    pr_dir = Path("artifacts") / "baseline_priority"
+    if loaded.priority_col and (pr_dir / "model.joblib").exists():
+        df_pr = df[df[loaded.priority_col].notna()].copy().reset_index(drop=True)
+        X_pr = df_pr[loaded.text_col].astype(str).tolist()
+        y_pr = df_pr[loaded.priority_col].astype(str).tolist()
 
-        lines.append(f"P0/P1 Recall (binary): {rec:.4f}")
-        lines.append(f"P0/P1 Precision (binary): {prec:.4f}")
-        lines.append("")
-        lines.append("Confusion matrix (P0/P1 vs others):")
-        lines.append(str(confusion_matrix(y_true_bin, y_pred_bin)))
+        pr = evaluate_target(
+            name="priority",
+            model_path=pr_dir / "model.joblib",
+            split_path=pr_dir / "split.json",
+            X=X_pr,
+            y=y_pr,
+        )
+        results["priority"] = pr
+        report_lines.append("=== PRIORITY (baseline) ===")
+        report_lines.append(pr["classification_report"])
+        report_lines.append(
+            f"macro_f1={pr['macro_f1']:.4f} weighted_f1={pr['weighted_f1']:.4f} acc={pr['accuracy']:.4f} "
+            f"severe_mistake_rate={pr.get('severe_mistake_rate', 0.0):.4f}"
+        )
+        report_lines.append("")
+    else:
+        report_lines.append("=== PRIORITY (baseline) ===")
+        report_lines.append("Model not found. Train it first:")
+        report_lines.append("  python -m src.triage.models.train_baseline --target priority")
+        report_lines.append("")
 
-    lines.append("")
-    lines.append("Classification report:")
-    lines.append(classification_report(y_test, preds))
+    ensure_dir(Path("reports"))
+    Path("reports/report.txt").write_text("\n".join(report_lines), encoding="utf-8")
+    Path("reports/metrics.json").write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    out_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"✅ Wrote report to {out_path}")
-    print("\n".join(lines[:10]))
+    print("[OK] Wrote reports/report.txt and reports/metrics.json")
 
 
 if __name__ == "__main__":

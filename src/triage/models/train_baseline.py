@@ -1,90 +1,130 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+import json
+from dataclasses import asdict
 from pathlib import Path
+from typing import Dict, Any
 
 import joblib
 import pandas as pd
-from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.metrics import f1_score, accuracy_score
+
+from src.triage.data.load import load_tickets
+from src.triage.data.split import stratified_split
 
 
-@dataclass(frozen=True)
-class TrainConfig:
-    data_path: str
-    out_dir: str
-    target: str  # "priority" or "category"
-    test_size: float
-    random_state: int
-
-
-def build_pipeline() -> Pipeline:
-    # text + simple one-hot on small structured fields
-    pre = ColumnTransformer(
-        transformers=[
-            ("text", TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_features=50000), "text"),
-        ],
-        remainder="drop",
+def build_pipeline(model_type: str) -> Pipeline:
+    vec = TfidfVectorizer(
+        ngram_range=(1, 2),
+        min_df=2,
+        max_features=200_000,
     )
 
-    clf = LogisticRegression(
-        max_iter=2000,
-        n_jobs=None,
-        class_weight="balanced",  # helps imbalance in synthetic
-        multi_class="auto",
-    )
+    if model_type == "logreg":
+        clf = LogisticRegression(
+            max_iter=2000,
+            class_weight="balanced",
+            n_jobs=None,
+        )
+    elif model_type == "linear_svc":
+        clf = LinearSVC(class_weight="balanced")
+    else:
+        raise ValueError(f"Unknown model_type: {model_type}")
 
-    return Pipeline([("pre", pre), ("clf", clf)])
+    return Pipeline([("tfidf", vec), ("clf", clf)])
+
+
+def ensure_dir(p: Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=str, default="data/tickets.csv")
-    ap.add_argument("--out", type=str, default="artifacts/baseline_priority")
-    ap.add_argument("--target", type=str, choices=["priority", "category"], default="priority")
-    ap.add_argument("--test", type=float, default=0.2)
+    ap.add_argument("--data", default="data/tickets.csv")
+    ap.add_argument("--target", choices=["category", "priority"], required=True)
+    ap.add_argument("--model", choices=["logreg", "linear_svc"], default="logreg")
+    ap.add_argument("--test-size", type=float, default=0.2)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--no-dedup", action="store_true", help="Do not drop duplicate texts")
+    ap.add_argument("--text-cols", nargs="*", default=None, help="Explicit text columns (e.g., title description)")
     args = ap.parse_args()
 
-    cfg = TrainConfig(
-        data_path=args.data,
-        out_dir=args.out,
-        target=args.target,
-        test_size=args.test,
-        random_state=args.seed,
+    loaded = load_tickets(
+        args.data,
+        text_cols=args.text_cols,
+        drop_duplicates_on_text=(not args.no_dedup),
     )
+    df = loaded.df
 
-    df = pd.read_csv(cfg.data_path)
-    if cfg.target not in df.columns:
-        raise ValueError(f"Target '{cfg.target}' not found in dataset columns: {list(df.columns)}")
+    if args.target == "category":
+        if not loaded.category_col:
+            raise SystemExit("Category label column not found. Ensure tickets.csv has a category/label column.")
+        y_col = loaded.category_col
+        outdir = Path("artifacts") / "baseline_category"
+    else:
+        if not loaded.priority_col:
+            raise SystemExit("Priority label column not found. Ensure tickets.csv has a priority/p column.")
+        y_col = loaded.priority_col
+        outdir = Path("artifacts") / "baseline_priority"
 
-    X = df[["text"]].copy()
-    y = df[cfg.target].astype(str)
+    # Drop rows with missing target
+    df = df[df[y_col].notna()].copy().reset_index(drop=True)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=cfg.test_size, random_state=cfg.random_state, stratify=y
-    )
+    X = df[loaded.text_col].astype(str).tolist()
+    y = df[y_col].astype(str).tolist()
 
-    pipe = build_pipeline()
+    split = stratified_split(y, test_size=args.test_size, seed=args.seed)
+    X_train = [X[i] for i in split.train_idx]
+    y_train = [y[i] for i in split.train_idx]
+    X_test = [X[i] for i in split.test_idx]
+    y_test = [y[i] for i in split.test_idx]
+
+    pipe = build_pipeline(args.model)
     pipe.fit(X_train, y_train)
 
-    preds = pipe.predict(X_test)
+    y_pred = pipe.predict(X_test)
 
-    print("=== Classification report (holdout) ===")
-    print(classification_report(y_test, preds))
+    metrics = {
+        "target": args.target,
+        "model": args.model,
+        "test_size": args.test_size,
+        "seed": args.seed,
+        "n_rows": int(len(df)),
+        "macro_f1": float(f1_score(y_test, y_pred, average="macro")),
+        "weighted_f1": float(f1_score(y_test, y_pred, average="weighted")),
+        "accuracy": float(accuracy_score(y_test, y_pred)),
+    }
 
-    out_dir = Path(cfg.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    ensure_dir(outdir)
+    joblib.dump(pipe, outdir / "model.joblib")
 
-    joblib.dump(pipe, out_dir / "model.joblib")
-    joblib.dump({"target": cfg.target}, out_dir / "meta.joblib")
+    (outdir / "split.json").write_text(
+        json.dumps(asdict(split), indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (outdir / "metrics.json").write_text(
+        json.dumps(metrics, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
-    print(f"✅ Saved model to {out_dir / 'model.joblib'} (target={cfg.target})")
+    meta: Dict[str, Any] = {
+        "data_path": str(args.data),
+        "text_col": loaded.text_col,
+        "target_col": y_col,
+        "outdir": str(outdir),
+        "rows_after_cleaning": int(len(df)),
+        "columns": list(df.columns),
+        "note": "Baseline training for Option A (two independent models) per docs/08_algorithm_formulation.md",
+    }
+    (outdir / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    print(f"[OK] Saved -> {outdir / 'model.joblib'}")
+    print(json.dumps(metrics, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

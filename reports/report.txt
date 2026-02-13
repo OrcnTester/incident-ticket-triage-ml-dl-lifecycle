@@ -1,0 +1,29 @@
+=== CATEGORY (baseline) ===
+                  precision    recall  f1-score   support
+
+      auth_issue      1.000     0.982     0.991        57
+      data_issue      0.984     1.000     0.992        61
+deployment_issue      1.000     1.000     1.000        63
+         latency      1.000     0.938     0.968        65
+          outage      0.944     1.000     0.971        68
+   payment_issue      0.984     0.984     0.984        64
+
+        accuracy                          0.984       378
+       macro avg      0.985     0.984     0.985       378
+    weighted avg      0.985     0.984     0.984       378
+
+macro_f1=0.9845 weighted_f1=0.9841 acc=0.9841
+
+=== PRIORITY (baseline) ===
+              precision    recall  f1-score   support
+
+          P0      0.677     0.966     0.796        87
+          P1      0.765     0.616     0.683       185
+          P2      0.204     0.151     0.173        73
+          P3      0.529     0.818     0.643        33
+
+    accuracy                          0.624       378
+   macro avg      0.544     0.638     0.574       378
+weighted avg      0.616     0.624     0.607       378
+
+macro_f1=0.5737 weighted_f1=0.6069 acc=0.6243 severe_mistake_rate=0.0159
