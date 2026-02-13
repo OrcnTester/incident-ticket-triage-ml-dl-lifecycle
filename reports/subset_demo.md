@@ -1,0 +1,25 @@
+# Subset / Region Demo Report
+
+- subset_id: `subset_system_payments_auth`
+- manifest_sha256: `e5054ec3b6e09b4f6eb9cfc465f8836e71a380c29aff44cfadc23baa0f7adb02`
+- data: `data\tickets.csv`
+- n_before: 2000
+- n_after: 500
+
+## Split
+- strategy: `group_holdout`
+- group_field: `system`
+- seed: 42  test_size: 0.2  val_size: 0.0
+- groups: n=2
+- train_groups: ['auth']
+- val_groups: []
+- test_groups: ['payments']
+
+## Label distributions
+### Category
+- train: {'n': 243, 'counts': {'deployment_issue': 46, 'outage': 45, 'payment_issue': 40, 'data_issue': 40, 'latency': 38, 'auth_issue': 34}, 'ratios': {'deployment_issue': 0.18930041152263374, 'outage': 0.18518518518518517, 'payment_issue': 0.1646090534979424, 'data_issue': 0.1646090534979424, 'latency': 0.15637860082304528, 'auth_issue': 0.13991769547325103}}
+- test:  {'n': 257, 'counts': {'deployment_issue': 49, 'payment_issue': 49, 'data_issue': 41, 'latency': 41, 'outage': 39, 'auth_issue': 38}, 'ratios': {'deployment_issue': 0.19066147859922178, 'payment_issue': 0.19066147859922178, 'data_issue': 0.15953307392996108, 'latency': 0.15953307392996108, 'outage': 0.1517509727626459, 'auth_issue': 0.14785992217898833}}
+
+### Priority
+- train: {'n': 243, 'counts': {'P1': 112, 'P0': 57, 'P2': 54, 'P3': 20}, 'ratios': {'P1': 0.4609053497942387, 'P0': 0.2345679012345679, 'P2': 0.2222222222222222, 'P3': 0.0823045267489712}}
+- test:  {'n': 257, 'counts': {'P1': 122, 'P0': 63, 'P2': 50, 'P3': 22}, 'ratios': {'P1': 0.47470817120622566, 'P0': 0.245136186770428, 'P2': 0.19455252918287938, 'P3': 0.08560311284046693}}

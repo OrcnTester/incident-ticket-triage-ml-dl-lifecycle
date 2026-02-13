@@ -2,9 +2,9 @@
   "category": {
     "target": "category",
     "n_test": 378,
-    "macro_f1": 0.9845129834766005,
-    "weighted_f1": 0.984109235596667,
-    "accuracy": 0.9841269841269841,
+    "macro_f1": 0.9951650199705696,
+    "weighted_f1": 0.9947067701955237,
+    "accuracy": 0.9947089947089947,
     "labels": [
       "auth_issue",
       "data_issue",
@@ -15,16 +15,16 @@
     ],
     "confusion_matrix": [
       [
-        56,
+        50,
         0,
         0,
         0,
-        1,
+        0,
         0
       ],
       [
         0,
-        61,
+        49,
         0,
         0,
         0,
@@ -40,18 +40,10 @@
       ],
       [
         0,
-        1,
-        0,
-        61,
-        2,
-        1
-      ],
-      [
         0,
         0,
+        70,
         0,
-        0,
-        68,
         0
       ],
       [
@@ -59,56 +51,76 @@
         0,
         0,
         0,
-        1,
-        63
+        78,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        2,
+        0,
+        66
       ]
     ],
-    "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue      1.000     0.982     0.991        57\n      data_issue      0.984     1.000     0.992        61\ndeployment_issue      1.000     1.000     1.000        63\n         latency      1.000     0.938     0.968        65\n          outage      0.944     1.000     0.971        68\n   payment_issue      0.984     0.984     0.984        64\n\n        accuracy                          0.984       378\n       macro avg      0.985     0.984     0.985       378\n    weighted avg      0.985     0.984     0.984       378\n",
+    "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue      1.000     1.000     1.000        50\n      data_issue      1.000     1.000     1.000        49\ndeployment_issue      1.000     1.000     1.000        63\n         latency      0.972     1.000     0.986        70\n          outage      1.000     1.000     1.000        78\n   payment_issue      1.000     0.971     0.985        68\n\n        accuracy                          0.995       378\n       macro avg      0.995     0.995     0.995       378\n    weighted avg      0.995     0.995     0.995       378\n",
     "label_distribution_test": {
       "n": 378,
       "counts": {
-        "auth_issue": 57,
-        "data_issue": 61,
+        "auth_issue": 50,
+        "data_issue": 49,
         "deployment_issue": 63,
-        "latency": 65,
-        "outage": 68,
-        "payment_issue": 64
+        "latency": 70,
+        "outage": 78,
+        "payment_issue": 68
       },
       "ratios": {
-        "auth_issue": 0.15079365079365079,
-        "data_issue": 0.16137566137566137,
+        "auth_issue": 0.13227513227513227,
+        "data_issue": 0.12962962962962962,
         "deployment_issue": 0.16666666666666666,
-        "latency": 0.17195767195767195,
-        "outage": 0.17989417989417988,
-        "payment_issue": 0.1693121693121693
+        "latency": 0.18518518518518517,
+        "outage": 0.20634920634920634,
+        "payment_issue": 0.17989417989417988
       }
     },
+    "split": {
+      "strategy": "time",
+      "test_size": 0.2,
+      "seed": 42,
+      "time_col": "timestamp",
+      "gap_days": 1,
+      "cutoff_timestamp": "2026-02-07T06:02:49+00:00",
+      "train_max_time": "2026-02-06T05:40:49+00:00",
+      "test_min_time": "2026-02-07T06:02:49+00:00",
+      "test_max_time": "2026-02-10T07:05:49+00:00",
+      "dropped_bad_timestamps": 0
+    },
     "label_distribution_train": {
-      "n": 1508,
+      "n": 1382,
       "counts": {
-        "auth_issue": 228,
-        "data_issue": 244,
-        "deployment_issue": 249,
-        "latency": 261,
-        "outage": 271,
-        "payment_issue": 255
+        "auth_issue": 216,
+        "data_issue": 239,
+        "deployment_issue": 229,
+        "latency": 232,
+        "outage": 231,
+        "payment_issue": 235
       },
       "ratios": {
-        "auth_issue": 0.15119363395225463,
-        "data_issue": 0.16180371352785147,
-        "deployment_issue": 0.16511936339522545,
-        "latency": 0.17307692307692307,
-        "outage": 0.1797082228116711,
-        "payment_issue": 0.16909814323607428
+        "auth_issue": 0.15629522431259044,
+        "data_issue": 0.17293777134587554,
+        "deployment_issue": 0.16570188133140376,
+        "latency": 0.1678726483357453,
+        "outage": 0.1671490593342981,
+        "payment_issue": 0.17004341534008682
       }
     }
   },
   "priority": {
     "target": "priority",
     "n_test": 378,
-    "macro_f1": 0.5737321876646113,
-    "weighted_f1": 0.6069246622630151,
-    "accuracy": 0.6243386243386243,
+    "macro_f1": 0.555733648249719,
+    "weighted_f1": 0.6013218483223851,
+    "accuracy": 0.6216931216931217,
     "labels": [
       "P0",
       "P1",
@@ -117,74 +129,86 @@
     ],
     "confusion_matrix": [
       [
-        84,
-        2,
+        92,
+        0,
         1,
         0
       ],
       [
-        35,
-        114,
-        36,
+        49,
+        112,
+        27,
         0
       ],
       [
-        5,
-        33,
-        11,
-        24
+        4,
+        34,
+        13,
+        22
       ],
       [
         0,
         0,
         6,
-        27
+        18
       ]
     ],
-    "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.677     0.966     0.796        87\n          P1      0.765     0.616     0.683       185\n          P2      0.204     0.151     0.173        73\n          P3      0.529     0.818     0.643        33\n\n    accuracy                          0.624       378\n   macro avg      0.544     0.638     0.574       378\nweighted avg      0.616     0.624     0.607       378\n",
+    "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.634     0.989     0.773        93\n          P1      0.767     0.596     0.671       188\n          P2      0.277     0.178     0.217        73\n          P3      0.450     0.750     0.562        24\n\n    accuracy                          0.622       378\n   macro avg      0.532     0.628     0.556       378\nweighted avg      0.620     0.622     0.601       378\n",
     "label_distribution_test": {
       "n": 378,
       "counts": {
-        "P0": 87,
-        "P1": 185,
+        "P0": 93,
+        "P1": 188,
         "P2": 73,
-        "P3": 33
+        "P3": 24
       },
       "ratios": {
-        "P0": 0.23015873015873015,
-        "P1": 0.4894179894179894,
+        "P0": 0.24603174603174602,
+        "P1": 0.4973544973544973,
         "P2": 0.1931216931216931,
-        "P3": 0.0873015873015873
+        "P3": 0.06349206349206349
       }
+    },
+    "split": {
+      "strategy": "time",
+      "test_size": 0.2,
+      "seed": 42,
+      "time_col": "timestamp",
+      "gap_days": 1,
+      "cutoff_timestamp": "2026-02-07T06:02:49+00:00",
+      "train_max_time": "2026-02-06T05:40:49+00:00",
+      "test_min_time": "2026-02-07T06:02:49+00:00",
+      "test_max_time": "2026-02-10T07:05:49+00:00",
+      "dropped_bad_timestamps": 0
     },
     "label_distribution_train": {
-      "n": 1508,
+      "n": 1382,
       "counts": {
-        "P0": 349,
-        "P1": 738,
-        "P2": 290,
-        "P3": 131
+        "P0": 308,
+        "P1": 673,
+        "P2": 268,
+        "P3": 133
       },
       "ratios": {
-        "P0": 0.23143236074270557,
-        "P1": 0.48938992042440316,
-        "P2": 0.19230769230769232,
-        "P3": 0.08687002652519894
+        "P0": 0.22286541244573083,
+        "P1": 0.4869753979739508,
+        "P2": 0.1939218523878437,
+        "P3": 0.09623733719247468
       }
     },
-    "severe_mistake_rate": 0.015873015873015872,
-    "p0_recall": 0.9655172413793104,
+    "severe_mistake_rate": 0.013227513227513227,
+    "p0_recall": 0.989247311827957,
     "p0p1_binary": {
-      "recall": 0.8639705882352942,
-      "precision": 0.8608058608058609,
+      "recall": 0.900355871886121,
+      "precision": 0.8694158075601375,
       "confusion_matrix": [
         [
-          68,
+          59,
           38
         ],
         [
-          37,
-          235
+          28,
+          253
         ]
       ]
     }

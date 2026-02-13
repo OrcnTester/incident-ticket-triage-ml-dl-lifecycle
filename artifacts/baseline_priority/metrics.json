@@ -3,8 +3,9 @@
   "model": "logreg",
   "test_size": 0.2,
   "seed": 42,
+  "split_strategy": "time",
   "n_rows": 1886,
-  "macro_f1": 0.5737321876646113,
-  "weighted_f1": 0.6069246622630151,
-  "accuracy": 0.6243386243386243
+  "macro_f1": 0.555733648249719,
+  "weighted_f1": 0.6013218483223851,
+  "accuracy": 0.6216931216931217
 }

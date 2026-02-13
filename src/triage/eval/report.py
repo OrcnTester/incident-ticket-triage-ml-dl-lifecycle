@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 
 import joblib
 from sklearn.metrics import (
@@ -21,7 +21,7 @@ def ensure_dir(p: Path) -> None:
     p.mkdir(parents=True, exist_ok=True)
 
 
-def load_split(path: Path) -> Optional[Dict[str, List[int]]]:
+def load_split(path: Path) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
@@ -37,7 +37,6 @@ def label_distribution(labels: List[str]) -> Dict[str, Any]:
         counts[y] = counts.get(y, 0) + 1
 
     ratios = {k: (v / n if n else 0.0) for k, v in counts.items()}
-    # stable ordering for readability
     ordered_keys = sorted(counts.keys())
     return {
         "n": n,
@@ -84,6 +83,22 @@ def p0p1_binary_metrics(y_true: List[str], y_pred: List[str]) -> Dict[str, Any]:
     return {"recall": float(rec), "precision": float(prec), "confusion_matrix": cm}
 
 
+def _split_meta(split: Dict[str, Any]) -> Dict[str, Any]:
+    keep = [
+        "strategy",
+        "test_size",
+        "seed",
+        "time_col",
+        "gap_days",
+        "cutoff_timestamp",
+        "train_max_time",
+        "test_min_time",
+        "test_max_time",
+        "dropped_bad_timestamps",
+    ]
+    return {k: split.get(k) for k in keep if k in split}
+
+
 def evaluate_target(
     *,
     name: str,
@@ -116,9 +131,10 @@ def evaluate_target(
         "classification_report": classification_report(y_test, y_pred, digits=3),
         # imbalance evidence
         "label_distribution_test": label_distribution(y_test),
+        # split evidence (helps for leakage discussion)
+        "split": _split_meta(split),
     }
 
-    # Include train distribution too (imbalance evidence)
     if train_idx:
         y_train = [y[i] for i in train_idx]
         out["label_distribution_train"] = label_distribution(y_train)
@@ -142,6 +158,17 @@ def _fmt_dist(d: Optional[Dict[str, Any]]) -> str:
     for k in counts.keys():
         parts.append(f"{k}:{counts[k]} ({ratios.get(k, 0.0)*100:.1f}%)")
     return ", ".join(parts) if parts else "n/a"
+
+
+def _fmt_split_meta(m: Dict[str, Any]) -> str:
+    if not m:
+        return "n/a"
+    if m.get("strategy") != "time":
+        return f"strategy={m.get('strategy')} seed={m.get('seed')} test_size={m.get('test_size')}"
+    return (
+        f"strategy=time time_col={m.get('time_col')} test_size={m.get('test_size')} gap_days={m.get('gap_days')} "
+        f"train_max={m.get('train_max_time')} test_min={m.get('test_min_time')}"
+    )
 
 
 def main() -> None:
@@ -172,6 +199,7 @@ def main() -> None:
         report_lines.append(
             f"macro_f1={cat['macro_f1']:.4f} weighted_f1={cat['weighted_f1']:.4f} acc={cat['accuracy']:.4f}"
         )
+        report_lines.append("Split: " + _fmt_split_meta(cat.get("split", {}) or {}))
         report_lines.append("Label distribution (train): " + _fmt_dist(cat.get("label_distribution_train")))
         report_lines.append("Label distribution (test):  " + _fmt_dist(cat.get("label_distribution_test")))
         report_lines.append("")
@@ -204,7 +232,6 @@ def main() -> None:
             f"severe_mistake_rate={pr.get('severe_mistake_rate', 0.0):.4f}"
         )
 
-        # Ops-focused metrics for imbalance
         p0r = pr.get("p0_recall", 0.0)
         p0p1 = pr.get("p0p1_binary", {}) or {}
         report_lines.append(
@@ -212,6 +239,7 @@ def main() -> None:
             f"p0p1_recall={float(p0p1.get('recall', 0.0)):.4f} "
             f"p0p1_precision={float(p0p1.get('precision', 0.0)):.4f}"
         )
+        report_lines.append("Split: " + _fmt_split_meta(pr.get("split", {}) or {}))
         report_lines.append("P0/P1 confusion matrix (binary): " + str(p0p1.get("confusion_matrix")))
         report_lines.append("Label distribution (train): " + _fmt_dist(pr.get("label_distribution_train")))
         report_lines.append("Label distribution (test):  " + _fmt_dist(pr.get("label_distribution_test")))

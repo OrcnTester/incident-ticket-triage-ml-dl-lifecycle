@@ -4,7 +4,7 @@ import argparse
 import json
 from dataclasses import asdict
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 import joblib
 import pandas as pd
@@ -15,7 +15,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import f1_score, accuracy_score
 
 from src.triage.data.load import load_tickets
-from src.triage.data.split import stratified_split
+from src.triage.data.split import stratified_split, time_aware_split
 
 
 def build_pipeline(model_type: str) -> Pipeline:
@@ -43,6 +43,15 @@ def ensure_dir(p: Path) -> None:
     p.mkdir(parents=True, exist_ok=True)
 
 
+def infer_time_col(df: pd.DataFrame) -> Optional[str]:
+    # keep it simple + explicit for portfolio
+    candidates = ["timestamp", "created_at", "created", "time", "ts"]
+    for c in candidates:
+        if c in df.columns:
+            return c
+    return None
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default="data/tickets.csv")
@@ -50,8 +59,14 @@ def main() -> None:
     ap.add_argument("--model", choices=["logreg", "linear_svc"], default="logreg")
     ap.add_argument("--test-size", type=float, default=0.2)
     ap.add_argument("--seed", type=int, default=42)
+
+    # leakage-aware split knobs
+    ap.add_argument("--split", choices=["stratified", "time"], default="stratified")
+    ap.add_argument("--time-col", default=None, help="Timestamp column name (default: infer)")
+    ap.add_argument("--gap-days", type=int, default=0, help="Optional gap between train and test (time split only)")
+
     ap.add_argument("--no-dedup", action="store_true", help="Do not drop duplicate texts")
-    ap.add_argument("--text-cols", nargs="*", default=None, help="Explicit text columns (e.g., title description)")
+    ap.add_argument("--text-cols", nargs="*", default=None, help="Explicit text columns (e.g. title description)")
     args = ap.parse_args()
 
     loaded = load_tickets(
@@ -75,14 +90,50 @@ def main() -> None:
     # Drop rows with missing target
     df = df[df[y_col].notna()].copy().reset_index(drop=True)
 
-    X = df[loaded.text_col].astype(str).tolist()
-    y = df[y_col].astype(str).tolist()
+    # Build split (stratified default; time-aware optional)
+    split_payload: Dict[str, Any]
+    if args.split == "time":
+        time_col = args.time_col or infer_time_col(df)
+        if not time_col:
+            raise SystemExit(
+                "Time-aware split requested but no time column found. "
+                "Provide --time-col or add a timestamp column to tickets.csv."
+            )
 
-    split = stratified_split(y, test_size=args.test_size, seed=args.seed)
-    X_train = [X[i] for i in split.train_idx]
-    y_train = [y[i] for i in split.train_idx]
-    X_test = [X[i] for i in split.test_idx]
-    y_test = [y[i] for i in split.test_idx]
+        # parse time, drop bad rows (keep indices consistent for report.py)
+        ts = pd.to_datetime(df[time_col], errors="coerce", utc=True)
+        n_bad = int(ts.isna().sum())
+        if n_bad:
+            df = df[ts.notna()].copy().reset_index(drop=True)
+            ts = pd.to_datetime(df[time_col], errors="coerce", utc=True)
+
+        X = df[loaded.text_col].astype(str).tolist()
+        y = df[y_col].astype(str).tolist()
+
+        split, meta = time_aware_split(ts, test_size=args.test_size, gap_days=args.gap_days)
+        split_payload = {
+            **asdict(split),
+            **meta,
+            "seed": int(args.seed),  # keep for completeness (even if not used)
+            "time_col": str(time_col),
+            "dropped_bad_timestamps": int(n_bad),
+        }
+    else:
+        X = df[loaded.text_col].astype(str).tolist()
+        y = df[y_col].astype(str).tolist()
+
+        split = stratified_split(y, test_size=args.test_size, seed=args.seed)
+        split_payload = {
+            **asdict(split),
+            "strategy": "stratified",
+            "test_size": float(args.test_size),
+            "seed": int(args.seed),
+        }
+
+    X_train = [X[i] for i in split_payload["train_idx"]]
+    y_train = [y[i] for i in split_payload["train_idx"]]
+    X_test = [X[i] for i in split_payload["test_idx"]]
+    y_test = [y[i] for i in split_payload["test_idx"]]
 
     pipe = build_pipeline(args.model)
     pipe.fit(X_train, y_train)
@@ -92,8 +143,9 @@ def main() -> None:
     metrics = {
         "target": args.target,
         "model": args.model,
-        "test_size": args.test_size,
-        "seed": args.seed,
+        "test_size": float(args.test_size),
+        "seed": int(args.seed),
+        "split_strategy": split_payload.get("strategy", "stratified"),
         "n_rows": int(len(df)),
         "macro_f1": float(f1_score(y_test, y_pred, average="macro")),
         "weighted_f1": float(f1_score(y_test, y_pred, average="weighted")),
@@ -104,7 +156,7 @@ def main() -> None:
     joblib.dump(pipe, outdir / "model.joblib")
 
     (outdir / "split.json").write_text(
-        json.dumps(asdict(split), indent=2, ensure_ascii=False),
+        json.dumps(split_payload, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
     (outdir / "metrics.json").write_text(
