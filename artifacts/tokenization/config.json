@@ -1,0 +1,17 @@
+{
+  "tokenizer": {
+    "mode": "subword",
+    "lowercase": true,
+    "ngram_min": 3,
+    "ngram_max": 5
+  },
+  "vocab": {
+    "min_freq": 2,
+    "max_size": 20000,
+    "pad_token": "<pad>",
+    "unk_token": "<unk>"
+  },
+  "max_len": 0,
+  "pad": false,
+  "text_col": "text"
+}
