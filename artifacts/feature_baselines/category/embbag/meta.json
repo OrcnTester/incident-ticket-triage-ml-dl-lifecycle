@@ -1,0 +1,29 @@
+{
+  "target": "category",
+  "mode": "embbag",
+  "seed": 42,
+  "vectorizer_cfg": {
+    "min_df": 2,
+    "max_features": 200000,
+    "ngram_min": 1,
+    "ngram_max": 2
+  },
+  "svd_dim": null,
+  "emb_dim": 128,
+  "buckets": 50000,
+  "metrics": {
+    "macro_f1": 0.9949628357332996,
+    "weighted_f1": 0.9950150381694083,
+    "accuracy": 0.995
+  },
+  "footprint": {
+    "feature_dim": 128,
+    "sparsity_ratio_est": null,
+    "sparse_mb_est": null,
+    "dense_mb_est": 0.25
+  },
+  "timing": {
+    "fit_s": 0.354401799995685,
+    "predict_s": 0.05071780001162551
+  }
+}

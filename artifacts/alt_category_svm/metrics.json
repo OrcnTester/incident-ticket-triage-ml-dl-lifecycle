@@ -1,0 +1,11 @@
+{
+  "target": "category",
+  "model": "svm",
+  "split_strategy": "stratified",
+  "test_size": 0.2,
+  "seed": 42,
+  "n_rows": 1886,
+  "macro_f1": 0.9895256037208807,
+  "weighted_f1": 0.989371893951425,
+  "accuracy": 0.9894179894179894
+}

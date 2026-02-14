@@ -1,0 +1,21 @@
+{
+  "tokenizer": {
+    "mode": "subword",
+    "lowercase": true,
+    "ngram_min": 3,
+    "ngram_max": 5
+  },
+  "vocab": {
+    "vocab_size": 1771,
+    "loaded_from": null
+  },
+  "collate": {
+    "pad_to": "fixed",
+    "max_len": 128,
+    "truncation": true,
+    "trunc_side": "head",
+    "batch_size": 32
+  },
+  "label_col": "priority",
+  "text_col": "text"
+}

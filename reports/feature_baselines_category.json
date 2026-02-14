@@ -1,0 +1,100 @@
+{
+  "target": "category",
+  "results": [
+    {
+      "mode": "onehot",
+      "metrics": {
+        "macro_f1": 0.9901799687010954,
+        "weighted_f1": 0.9900639671361502,
+        "accuracy": 0.99
+      },
+      "footprint": {
+        "feature_dim": 805,
+        "sparsity_ratio_est": 0.9856366459627329,
+        "sparse_mb_est": 0.06970596313476562,
+        "dense_mb_est": null
+      },
+      "timing": {
+        "fit_s": 0.2149321000033524,
+        "predict_s": 0.0182341999898199
+      },
+      "out_dir": "artifacts\\feature_baselines\\category\\onehot"
+    },
+    {
+      "mode": "bow",
+      "metrics": {
+        "macro_f1": 0.9901799687010954,
+        "weighted_f1": 0.9900639671361502,
+        "accuracy": 0.99
+      },
+      "footprint": {
+        "feature_dim": 805,
+        "sparsity_ratio_est": 0.9856366459627329,
+        "sparse_mb_est": 0.06970596313476562,
+        "dense_mb_est": null
+      },
+      "timing": {
+        "fit_s": 0.04668559998390265,
+        "predict_s": 0.002816799998981878
+      },
+      "out_dir": "artifacts\\feature_baselines\\category\\bow"
+    },
+    {
+      "mode": "tfidf",
+      "metrics": {
+        "macro_f1": 0.9925106217659408,
+        "weighted_f1": 0.9925293793086345,
+        "accuracy": 0.9925
+      },
+      "footprint": {
+        "feature_dim": 805,
+        "sparsity_ratio_est": 0.9856366459627329,
+        "sparse_mb_est": 0.06970596313476562,
+        "dense_mb_est": null
+      },
+      "timing": {
+        "fit_s": 0.07208749998244457,
+        "predict_s": 0.0034623999963514507
+      },
+      "out_dir": "artifacts\\feature_baselines\\category\\tfidf"
+    },
+    {
+      "mode": "svd",
+      "metrics": {
+        "macro_f1": 0.9925264550264551,
+        "weighted_f1": 0.9924940476190476,
+        "accuracy": 0.9925
+      },
+      "footprint": {
+        "feature_dim": 256,
+        "sparsity_ratio_est": null,
+        "sparse_mb_est": null,
+        "dense_mb_est": 1.0
+      },
+      "timing": {
+        "fit_s": 1.5159562000189908,
+        "predict_s": 0.012726299988571554
+      },
+      "out_dir": "artifacts\\feature_baselines\\category\\svd"
+    },
+    {
+      "mode": "embbag",
+      "metrics": {
+        "macro_f1": 0.9949628357332996,
+        "weighted_f1": 0.9950150381694083,
+        "accuracy": 0.995
+      },
+      "footprint": {
+        "feature_dim": 128,
+        "sparsity_ratio_est": null,
+        "sparse_mb_est": null,
+        "dense_mb_est": 0.25
+      },
+      "timing": {
+        "fit_s": 0.354401799995685,
+        "predict_s": 0.05071780001162551
+      },
+      "out_dir": "artifacts\\feature_baselines\\category\\embbag"
+    }
+  ]
+}

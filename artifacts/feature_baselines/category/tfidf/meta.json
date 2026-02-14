@@ -1,0 +1,29 @@
+{
+  "target": "category",
+  "mode": "tfidf",
+  "seed": 42,
+  "vectorizer_cfg": {
+    "min_df": 2,
+    "max_features": 200000,
+    "ngram_min": 1,
+    "ngram_max": 2
+  },
+  "svd_dim": null,
+  "emb_dim": null,
+  "buckets": null,
+  "metrics": {
+    "macro_f1": 0.9925106217659408,
+    "weighted_f1": 0.9925293793086345,
+    "accuracy": 0.9925
+  },
+  "footprint": {
+    "feature_dim": 805,
+    "sparsity_ratio_est": 0.9856366459627329,
+    "sparse_mb_est": 0.06970596313476562,
+    "dense_mb_est": null
+  },
+  "timing": {
+    "fit_s": 0.07208749998244457,
+    "predict_s": 0.0034623999963514507
+  }
+}

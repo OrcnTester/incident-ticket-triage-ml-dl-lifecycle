@@ -1,0 +1,28 @@
+{
+  "data_path": "data/tickets.csv",
+  "text_col": "text",
+  "target_col": "priority_norm",
+  "outdir": "artifacts\\alt_priority_rf",
+  "rows_after_cleaning": 1886,
+  "columns": [
+    "text",
+    "system",
+    "source",
+    "error_code",
+    "timestamp",
+    "category",
+    "priority",
+    "routing_team",
+    "priority_norm",
+    "category_norm"
+  ],
+  "split_meta": {
+    "strategy": "stratified"
+  },
+  "note": "Alternative classical models for baseline comparison",
+  "rf": {
+    "svd_dim": 256,
+    "rf_estimators": 300,
+    "rf_max_depth": null
+  }
+}

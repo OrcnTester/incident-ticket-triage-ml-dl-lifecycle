@@ -1,0 +1,31 @@
+{
+  "data_path": "data/tickets.csv",
+  "text_col": "text",
+  "target_col": "priority_norm",
+  "outdir": "artifacts\\alt_priority_svm",
+  "rows_after_cleaning": 1886,
+  "columns": [
+    "text",
+    "system",
+    "source",
+    "error_code",
+    "timestamp",
+    "category",
+    "priority",
+    "routing_team",
+    "priority_norm",
+    "category_norm"
+  ],
+  "split_meta": {
+    "strategy": "time",
+    "n_total": 1886,
+    "n_test": 378,
+    "n_train_before_gap": 1508,
+    "n_train_after_gap": 1382,
+    "test_min_timestamp": "2026-02-07T06:02:49+00:00",
+    "gap_days": 1,
+    "train_cutoff_timestamp": "2026-02-06T06:02:49+00:00"
+  },
+  "note": "Alternative classical models for baseline comparison",
+  "rf": null
+}

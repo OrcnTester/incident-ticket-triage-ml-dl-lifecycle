@@ -1,0 +1,37 @@
+{
+  "env": {
+    "python": "3.13.7",
+    "sklearn": "1.8.0",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "notes": "pipeline design demo"
+  },
+  "data_path": "data/tickets.csv",
+  "text_col": "text",
+  "target_col": "category_norm",
+  "vectorizer": {
+    "ngram_min": 1,
+    "ngram_max": 2,
+    "min_df": 2,
+    "max_features": 200000
+  },
+  "model": "rf",
+  "rf": {
+    "svd_dim": 256,
+    "rf_estimators": 300
+  },
+  "split": {
+    "strategy": "stratified_group_sample",
+    "test_size": 0.2,
+    "seed": 42
+  },
+  "metrics": {
+    "target": "category",
+    "model": "rf",
+    "n_rows": 1886,
+    "n_train": 1509,
+    "n_test": 377,
+    "macro_f1": 0.9817210405701865,
+    "weighted_f1": 0.9813762470281834,
+    "accuracy": 0.9814323607427056
+  }
+}

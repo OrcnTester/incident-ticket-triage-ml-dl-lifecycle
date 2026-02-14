@@ -1,0 +1,41 @@
+{
+  "target": "priority",
+  "mode": "embbag",
+  "seed": 42,
+  "vectorizer_cfg": {
+    "min_df": 2,
+    "max_features": 200000,
+    "ngram_min": 1,
+    "ngram_max": 2
+  },
+  "svd_dim": null,
+  "emb_dim": 128,
+  "buckets": 50000,
+  "metrics": {
+    "macro_f1": 0.5894165855755666,
+    "weighted_f1": 0.6056517801182898,
+    "accuracy": 0.625,
+    "p0p1_recall": 0.8546712802768166,
+    "p0p1_precision": 0.8666666666666667,
+    "confusion_matrix": [
+      [
+        73,
+        38
+      ],
+      [
+        42,
+        247
+      ]
+    ]
+  },
+  "footprint": {
+    "feature_dim": 128,
+    "sparsity_ratio_est": null,
+    "sparse_mb_est": null,
+    "dense_mb_est": 0.25
+  },
+  "timing": {
+    "fit_s": 0.49542369999107905,
+    "predict_s": 0.034348900022450835
+  }
+}

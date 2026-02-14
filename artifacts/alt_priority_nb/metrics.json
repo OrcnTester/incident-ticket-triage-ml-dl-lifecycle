@@ -1,0 +1,11 @@
+{
+  "target": "priority",
+  "model": "nb",
+  "split_strategy": "stratified",
+  "test_size": 0.2,
+  "seed": 42,
+  "n_rows": 1886,
+  "macro_f1": 0.5098094006604131,
+  "weighted_f1": 0.6203989930685526,
+  "accuracy": 0.6481481481481481
+}

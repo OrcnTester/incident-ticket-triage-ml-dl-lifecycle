@@ -1,0 +1,363 @@
+{
+  "category": {
+    "nb": {
+      "n_test": 378,
+      "macro_f1": 0.9820922211271079,
+      "weighted_f1": 0.9814870498535392,
+      "accuracy": 0.9814814814814815,
+      "labels": [
+        "auth_issue",
+        "data_issue",
+        "deployment_issue",
+        "latency",
+        "outage",
+        "payment_issue"
+      ],
+      "confusion_matrix": [
+        [
+          56,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          61,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          63,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          61,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          67,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          63
+        ]
+      ],
+      "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue      1.000     0.982     0.991        57\n      data_issue      1.000     1.000     1.000        61\ndeployment_issue      1.000     1.000     1.000        63\n         latency      0.984     0.938     0.961        65\n          outage      0.944     0.985     0.964        68\n   payment_issue      0.969     0.984     0.977        64\n\n        accuracy                          0.981       378\n       macro avg      0.983     0.982     0.982       378\n    weighted avg      0.982     0.981     0.981       378\n"
+    },
+    "rf": {
+      "n_test": 378,
+      "macro_f1": 0.9843755815606454,
+      "weighted_f1": 0.9841554782297514,
+      "accuracy": 0.9841269841269841,
+      "labels": [
+        "auth_issue",
+        "data_issue",
+        "deployment_issue",
+        "latency",
+        "outage",
+        "payment_issue"
+      ],
+      "confusion_matrix": [
+        [
+          55,
+          0,
+          0,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          61,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          63,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          64,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          67,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          62
+        ]
+      ],
+      "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue      1.000     0.965     0.982        57\n      data_issue      0.984     1.000     0.992        61\ndeployment_issue      1.000     1.000     1.000        63\n         latency      0.970     0.985     0.977        65\n          outage      0.957     0.985     0.971        68\n   payment_issue      1.000     0.969     0.984        64\n\n        accuracy                          0.984       378\n       macro avg      0.985     0.984     0.984       378\n    weighted avg      0.984     0.984     0.984       378\n"
+    },
+    "svm": {
+      "n_test": 378,
+      "macro_f1": 0.9895256037208807,
+      "weighted_f1": 0.989371893951425,
+      "accuracy": 0.9894179894179894,
+      "labels": [
+        "auth_issue",
+        "data_issue",
+        "deployment_issue",
+        "latency",
+        "outage",
+        "payment_issue"
+      ],
+      "confusion_matrix": [
+        [
+          56,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          61,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          63,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          62,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          68,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          64
+        ]
+      ],
+      "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue      1.000     0.982     0.991        57\n      data_issue      0.984     1.000     0.992        61\ndeployment_issue      1.000     1.000     1.000        63\n         latency      1.000     0.954     0.976        65\n          outage      0.971     1.000     0.986        68\n   payment_issue      0.985     1.000     0.992        64\n\n        accuracy                          0.989       378\n       macro avg      0.990     0.989     0.990       378\n    weighted avg      0.990     0.989     0.989       378\n"
+    }
+  },
+  "priority": {
+    "nb": {
+      "n_test": 378,
+      "macro_f1": 0.5098094006604131,
+      "weighted_f1": 0.6203989930685526,
+      "accuracy": 0.6481481481481481,
+      "labels": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "confusion_matrix": [
+        [
+          63,
+          24,
+          0,
+          0
+        ],
+        [
+          30,
+          155,
+          0,
+          0
+        ],
+        [
+          3,
+          42,
+          22,
+          6
+        ],
+        [
+          0,
+          2,
+          26,
+          5
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.656     0.724     0.689        87\n          P1      0.695     0.838     0.760       185\n          P2      0.458     0.301     0.364        73\n          P3      0.455     0.152     0.227        33\n\n    accuracy                          0.648       378\n   macro avg      0.566     0.504     0.510       378\nweighted avg      0.619     0.648     0.620       378\n",
+      "p0p1_binary": {
+        "recall": 1.0,
+        "precision": 0.8526645768025078,
+        "confusion_matrix": [
+          [
+            59,
+            47
+          ],
+          [
+            0,
+            272
+          ]
+        ]
+      },
+      "severe_mistake_rate": 0.013227513227513227
+    },
+    "rf": {
+      "n_test": 378,
+      "macro_f1": 0.5211477262917447,
+      "weighted_f1": 0.5925107930033511,
+      "accuracy": 0.6322751322751323,
+      "labels": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "confusion_matrix": [
+        [
+          53,
+          34,
+          0,
+          0
+        ],
+        [
+          24,
+          161,
+          0,
+          0
+        ],
+        [
+          2,
+          48,
+          10,
+          13
+        ],
+        [
+          0,
+          9,
+          9,
+          15
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.671     0.609     0.639        87\n          P1      0.639     0.870     0.737       185\n          P2      0.526     0.137     0.217        73\n          P3      0.536     0.455     0.492        33\n\n    accuracy                          0.632       378\n   macro avg      0.593     0.518     0.521       378\nweighted avg      0.616     0.632     0.593       378\n",
+      "p0p1_binary": {
+        "recall": 1.0,
+        "precision": 0.8217522658610272,
+        "confusion_matrix": [
+          [
+            47,
+            59
+          ],
+          [
+            0,
+            272
+          ]
+        ]
+      },
+      "severe_mistake_rate": 0.0291005291005291
+    },
+    "svm": {
+      "n_test": 378,
+      "macro_f1": 0.5739883253664039,
+      "weighted_f1": 0.6328154462334966,
+      "accuracy": 0.6481481481481481,
+      "labels": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "confusion_matrix": [
+        [
+          85,
+          7,
+          1,
+          0
+        ],
+        [
+          38,
+          129,
+          21,
+          0
+        ],
+        [
+          3,
+          38,
+          17,
+          15
+        ],
+        [
+          0,
+          0,
+          10,
+          14
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.675     0.914     0.776        93\n          P1      0.741     0.686     0.713       188\n          P2      0.347     0.233     0.279        73\n          P3      0.483     0.583     0.528        24\n\n    accuracy                          0.648       378\n   macro avg      0.561     0.604     0.574       378\nweighted avg      0.632     0.648     0.633       378\n",
+      "p0p1_binary": {
+        "recall": 0.9217081850533808,
+        "precision": 0.8633333333333333,
+        "confusion_matrix": [
+          [
+            56,
+            41
+          ],
+          [
+            22,
+            259
+          ]
+        ]
+      },
+      "severe_mistake_rate": 0.010582010582010581
+    }
+  }
+}
