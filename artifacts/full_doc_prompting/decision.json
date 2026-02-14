@@ -1,0 +1,10 @@
+{
+  "strategy": "full_doc",
+  "reason": "Doc fits token budget and doc_count is small \u2192 simplest grounding is full-doc prompting.",
+  "context_limit": 8192,
+  "doc_tokens": 86,
+  "overhead_tokens": 800,
+  "expected_output_tokens": 500,
+  "safety_margin_ratio": 0.8,
+  "fits_budget": true
+}

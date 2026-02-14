@@ -1,0 +1,33 @@
+{
+  "kb_dir": "data\\kb",
+  "manifest_path": "data/kb/sources_manifest.json",
+  "chunk_cfg": {
+    "mode": "tokens",
+    "chunk_size": 200,
+    "overlap": 40,
+    "min_size": 20,
+    "normalize_ws": true
+  },
+  "n_docs": 3,
+  "n_chunks": 3,
+  "elapsed_s": 0.000877300015417859,
+  "split": {
+    "test_size": 0.2,
+    "seed": 42,
+    "n_train_docs": 2,
+    "n_test_docs": 1,
+    "doc_id_intersection": 0
+  },
+  "stats": {
+    "empty_chunks": 0,
+    "duplicate_ratio": 0.0,
+    "n_tokens_min": 34,
+    "n_tokens_median": 54.0,
+    "n_tokens_p95": 55,
+    "n_tokens_max": 55,
+    "n_chars_min": 243,
+    "n_chars_median": 317.0,
+    "n_chars_p95": 329,
+    "n_chars_max": 329
+  }
+}

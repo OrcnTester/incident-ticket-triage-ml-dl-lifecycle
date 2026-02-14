@@ -1,0 +1,144 @@
+{
+  "kb_dir": "data\\kb",
+  "n_docs": 3,
+  "strategies": [
+    {
+      "name": "token",
+      "cfg": {
+        "chunk_size": 200,
+        "overlap": 40,
+        "min_size": 20,
+        "normalize": true
+      },
+      "stats": {
+        "n_chunks": 3,
+        "empty_chunks": 0,
+        "duplicate_ratio": 0.0,
+        "n_tokens_min": 34,
+        "n_tokens_median": 54.0,
+        "n_tokens_p95": 55,
+        "n_tokens_max": 55,
+        "n_chars_min": 243,
+        "n_chars_median": 317.0,
+        "n_chars_p95": 329,
+        "n_chars_max": 329,
+        "sentence_boundary_ratio": 0.6666666666666666,
+        "elapsed_s": 0.00012860001879744232
+      },
+      "preview": [
+        {
+          "chunk_id": "ch_1c94657aa2c6",
+          "doc_id": "ownership_payments",
+          "strategy": "token",
+          "text": "service ownership payments service payments-api owner team payments on-call payments-oncall common symptoms - elevated 5xx on /checkout - spike in timeout errors routing note if errors mention checkout or payment_intent route to team payments.",
+          "start": 0,
+          "end": 34,
+          "n_tokens": 34,
+          "n_chars": 243
+        },
+        {
+          "chunk_id": "ch_963cb2a01549",
+          "doc_id": "runbook_api_5xx",
+          "strategy": "token",
+          "text": "runbook api 5xx spike when you see elevated 5xx - check recent deployments last 30-60 mins - check upstream dependency latency/timeouts - verify error rate by endpoint and region - if db latency is high consult db latency runbook stop conditions / escalate - if p0 customer impact confirmed and error rate threshold page on-call.",
+          "start": 0,
+          "end": 55,
+          "n_tokens": 55,
+          "n_chars": 329
+        }
+      ]
+    },
+    {
+      "name": "sentence",
+      "cfg": {
+        "chunk_size": 200,
+        "overlap": 40,
+        "min_size": 20,
+        "normalize": true
+      },
+      "stats": {
+        "n_chunks": 3,
+        "empty_chunks": 0,
+        "duplicate_ratio": 0.0,
+        "n_tokens_min": 34,
+        "n_tokens_median": 54.0,
+        "n_tokens_p95": 55,
+        "n_tokens_max": 55,
+        "n_chars_min": 259,
+        "n_chars_median": 328.0,
+        "n_chars_p95": 342,
+        "n_chars_max": 342,
+        "sentence_boundary_ratio": 0.6666666666666666,
+        "elapsed_s": 0.00010559998918324709
+      },
+      "preview": [
+        {
+          "chunk_id": "ch_60c36d6f9b54",
+          "doc_id": "ownership_payments",
+          "strategy": "sentence",
+          "text": "# Service Ownership: Payments\n\nService: payments-api\nOwner: Team Payments\nOn-call: payments-oncall\n\nCommon symptoms:\n- Elevated 5xx on /checkout\n- Spike in timeout errors\n\nRouting note:\nIf errors mention \"checkout\" or \"payment_intent\", route to Team Payments.",
+          "start": 0,
+          "end": 1,
+          "n_tokens": 34,
+          "n_chars": 259
+        },
+        {
+          "chunk_id": "ch_069640c5df48",
+          "doc_id": "runbook_api_5xx",
+          "strategy": "sentence",
+          "text": "# Runbook: API 5xx Spike\n\nWhen you see elevated 5xx:\n- Check recent deployments (last 30-60 mins)\n- Check upstream dependency latency/timeouts\n- Verify error rate by endpoint and region\n- If DB latency is high, consult DB latency runbook\n\nStop conditions / escalate:\n- If P0 customer impact confirmed and error rate > threshold, page on-call.",
+          "start": 0,
+          "end": 1,
+          "n_tokens": 55,
+          "n_chars": 342
+        }
+      ]
+    },
+    {
+      "name": "recursive",
+      "cfg": {
+        "chunk_size": 200,
+        "overlap": 40,
+        "min_size": 20,
+        "normalize": true
+      },
+      "stats": {
+        "n_chunks": 6,
+        "empty_chunks": 0,
+        "duplicate_ratio": 0.0,
+        "n_tokens_min": 20,
+        "n_tokens_median": 25.5,
+        "n_tokens_p95": 34,
+        "n_tokens_max": 34,
+        "n_chars_min": 128,
+        "n_chars_median": 177.0,
+        "n_chars_p95": 198,
+        "n_chars_max": 198,
+        "sentence_boundary_ratio": 0.3333333333333333,
+        "elapsed_s": 7.309997454285622e-05
+      },
+      "preview": [
+        {
+          "chunk_id": "ch_4e1dee820b8f",
+          "doc_id": "ownership_payments",
+          "strategy": "recursive",
+          "text": "# Service Ownership: Payments\n\nService: payments-api\nOwner: Team Payments\nOn-call: payments-oncall\n\nCommon symptoms:\n- Elevated 5xx on /checkout\n- Spike in timeout errors",
+          "start": 0,
+          "end": 1,
+          "n_tokens": 22,
+          "n_chars": 170
+        },
+        {
+          "chunk_id": "ch_1f714ddf0023",
+          "doc_id": "ownership_payments",
+          "strategy": "recursive",
+          "text": "x on /checkout\n- Spike in timeout errors Routing note:\nIf errors mention \"checkout\" or \"payment_intent\", route to Team Payments.",
+          "start": 0,
+          "end": 2,
+          "n_tokens": 20,
+          "n_chars": 128
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "docs": [
+    {
+      "doc_id": "doc_558038c08ec4",
+      "path": "data/kb/ownership_payments.md",
+      "source_type": "runbook",
+      "title": "ownership_payments",
+      "service": null,
+      "owner": null,
+      "timestamp": null,
+      "tags": []
+    },
+    {
+      "doc_id": "doc_f22e4cd53578",
+      "path": "data/kb/runbook_api_5xx.md",
+      "source_type": "runbook",
+      "title": "runbook_api_5xx",
+      "service": null,
+      "owner": null,
+      "timestamp": null,
+      "tags": []
+    },
+    {
+      "doc_id": "doc_85d21800cb25",
+      "path": "data/kb/runbook_db_latency.md",
+      "source_type": "runbook",
+      "title": "runbook_db_latency",
+      "service": null,
+      "owner": null,
+      "timestamp": null,
+      "tags": []
+    }
+  ]
+}
