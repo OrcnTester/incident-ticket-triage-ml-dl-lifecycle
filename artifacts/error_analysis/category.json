@@ -1,0 +1,108 @@
+{
+  "target": "category",
+  "model_path": "artifacts\\baseline_category\\model.joblib",
+  "split": {
+    "strategy": "time",
+    "test_size": 0.2,
+    "seed": 42,
+    "gap_days": 1,
+    "time_col": "timestamp",
+    "n_train": 1474,
+    "n_test": 400,
+    "train_min_ts": "2026-01-26T07:25:49+00:00",
+    "train_max_ts": "2026-02-06T07:34:49+00:00",
+    "test_min_ts": "2026-02-07T07:38:49+00:00",
+    "test_max_ts": "2026-02-10T07:05:49+00:00"
+  },
+  "macro_f1": 0.9955255255255255,
+  "weighted_f1": 0.9949995495495494,
+  "accuracy": 0.995,
+  "labels": [
+    "auth_issue",
+    "data_issue",
+    "deployment_issue",
+    "latency",
+    "outage",
+    "payment_issue"
+  ],
+  "confusion_matrix": [
+    [
+      51,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      53,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      65,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      74,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      82,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      2,
+      0,
+      73
+    ]
+  ],
+  "top_confusions": [
+    {
+      "true": "payment_issue",
+      "pred": "latency",
+      "count": 2
+    }
+  ],
+  "examples": {
+    "payment_issue → latency": [
+      {
+        "true": "payment_issue",
+        "pred": "latency",
+        "timestamp": "2026-02-07T08:56:49Z",
+        "system": "inventory",
+        "source": "partner",
+        "error_code": "E429",
+        "text_excerpt": "[inventory] paymen tdeclined (E429). urgent"
+      },
+      {
+        "true": "payment_issue",
+        "pred": "latency",
+        "timestamp": "2026-02-10T06:26:49Z",
+        "system": "gateway",
+        "source": "batch_job",
+        "error_code": "E500",
+        "text_excerpt": "[gateway] webhoo kfailed (E500). intermittent"
+      }
+    ]
+  },
+  "classification_report": "                  precision    recall  f1-score   support\n\n      auth_issue       1.00      1.00      1.00        51\n      data_issue       1.00      1.00      1.00        53\ndeployment_issue       1.00      1.00      1.00        65\n         latency       0.97      1.00      0.99        74\n          outage       1.00      1.00      1.00        82\n   payment_issue       1.00      0.97      0.99        75\n\n        accuracy                           0.99       400\n       macro avg       1.00      1.00      1.00       400\n    weighted avg       1.00      0.99      0.99       400\n"
+}

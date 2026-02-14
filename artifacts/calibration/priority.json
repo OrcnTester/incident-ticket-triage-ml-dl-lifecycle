@@ -1,0 +1,102 @@
+{
+  "target": "priority",
+  "model_path": "artifacts/baseline_priority/model.joblib",
+  "split": {
+    "strategy": "time",
+    "test_size": 0.2,
+    "gap_days": 1,
+    "time_col": "timestamp",
+    "n_train": 1474,
+    "n_test": 400,
+    "train_min_ts": "2026-01-26T07:25:49+00:00",
+    "train_max_ts": "2026-02-07T07:38:49+00:00",
+    "test_min_ts": "2026-02-07T07:38:49+00:00",
+    "test_max_ts": "2026-02-10T07:05:49+00:00",
+    "nat_timestamps": 0,
+    "seed": 42
+  },
+  "calibration": {
+    "method": "sigmoid",
+    "calib_frac": 0.2,
+    "calib_n": 295,
+    "cv": 3,
+    "refit": true
+  },
+  "accuracy": 0.645,
+  "macro_f1": 0.5458974758064674,
+  "log_loss": 0.8326695785613389,
+  "ece": 0.04258862964474668,
+  "labels": [
+    "P0",
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "n_test": 400,
+  "p0p1_binary": {
+    "log_loss": 0.3979919208393045,
+    "ece": 0.1774590683995894
+  },
+  "top_confident_wrong": [
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7962361130036569,
+      "text_excerpt": "[payments] version mismatch (E429). occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7814949512116521,
+      "text_excerpt": "[search] config error (TIMEOUT). occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7812294259208777,
+      "text_excerpt": "[billing] version mismatch (OOM). occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7787318235873059,
+      "text_excerpt": "[inventory] version mismatch (E503). occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.778404220867534,
+      "text_excerpt": "[auth] after deploy (E503). user says app is broken. occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7781832453122849,
+      "text_excerpt": "[payments] config error (TIMEOUT). occurred right after deployment. urgent"
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7778463363075111,
+      "text_excerpt": "[auth] config error (OOM). occurred right after deployment. intermittent"
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7772898027631391,
+      "text_excerpt": "[billing] token invalid (E503). intermittent"
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7763061342885232,
+      "text_excerpt": "[billing] config error (E500). occurred right after deployment."
+    },
+    {
+      "true": "P2",
+      "pred": "P1",
+      "confidence": 0.7687610904777339,
+      "text_excerpt": "[payments] config error (DB_CONN). occurred right after deployment."
+    }
+  ]
+}
