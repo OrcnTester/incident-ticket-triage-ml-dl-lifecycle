@@ -1,0 +1,27 @@
+{
+  "source": "synthetic:overfit",
+  "n_classes": 4,
+  "stats": {
+    "n_epochs": 12,
+    "train_loss_start": 1.3560943415950886,
+    "train_loss_end": 0.2985196287433796,
+    "train_loss_drop_ratio": 0.779868096498176,
+    "val_loss_min": 0.6365756595742262,
+    "val_loss_end": 0.7942329270982099,
+    "val_loss_rebound_ratio": 0.2476646179488433,
+    "train_acc_end": 0.9125917647425619,
+    "val_acc_end": 0.6165131142722429,
+    "val_acc_mean": 0.5221697257159609
+  },
+  "diagnosis": {
+    "status": "overfit",
+    "flags": [
+      "val_loss rebounded >15% after its minimum while training improved → overfitting signal."
+    ],
+    "next_actions": [
+      "Use early stopping (pick epoch at min val_loss).",
+      "Add regularization (dropout/L2), reduce epochs, or simplify model.",
+      "Get more diverse training data / augment data."
+    ]
+  }
+}

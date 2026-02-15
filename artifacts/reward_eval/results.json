@@ -1,0 +1,19 @@
+{
+  "pairwise_accuracy": 0.0,
+  "spearman_correlation": -0.8944271909999159,
+  "total_pairs": 2,
+  "disagreements": [
+    {
+      "id": "1",
+      "score_a": 0.4210446142866463,
+      "score_b": 0.7416689356145733,
+      "preferred": "A"
+    },
+    {
+      "id": "2",
+      "score_a": 0.47615826222934565,
+      "score_b": 0.19453724793318106,
+      "preferred": "B"
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "target": "priority",
+  "model_path": null,
+  "split": {
+    "n_train": 1474,
+    "n_test": 400,
+    "train_min_ts": "2026-01-26T07:25:49+00:00",
+    "train_max_ts": "2026-02-06T07:34:49+00:00",
+    "test_min_ts": "2026-02-07T07:38:49+00:00",
+    "test_max_ts": "2026-02-10T07:05:49+00:00",
+    "gap_days": 1,
+    "strategy": "time",
+    "test_size": 0.2,
+    "seed": 42,
+    "time_col": "timestamp"
+  },
+  "accuracy": 0.8025,
+  "macro_f1": 0.7635609829323761,
+  "weighted_f1": 0.8077096499874079,
+  "labels": [
+    "P0",
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "confusion_matrix": [
+    [
+      85,
+      4,
+      7,
+      5
+    ],
+    [
+      19,
+      153,
+      15,
+      9
+    ],
+    [
+      7,
+      5,
+      63,
+      3
+    ],
+    [
+      3,
+      0,
+      2,
+      20
+    ]
+  ],
+  "top_confusions": [
+    {
+      "true": "P1",
+      "pred": "P0",
+      "count": 19
+    },
+    {
+      "true": "P1",
+      "pred": "P2",
+      "count": 15
+    },
+    {
+      "true": "P1",
+      "pred": "P3",
+      "count": 9
+    },
+    {
+      "true": "P2",
+      "pred": "P0",
+      "count": 7
+    },
+    {
+      "true": "P0",
+      "pred": "P2",
+      "count": 7
+    }
+  ],
+  "examples": {
+    "P1 \u2192 P0": [
+      {
+        "true": "P1",
+        "pred": "P0",
+        "timestamp": "2026-02-07T07:38:49Z",
+        "system": "inventory",
+        "source": "batch_job",
+        "error_code": "OOM",
+        "confidence": 0.847372812024916,
+        "text_excerpt": "[inventory] lag (OOM)."
+      },
+      {
+        "true": "P1",
+        "pred": "P0",
+        "timestamp": "2026-02-07T15:12:49Z",
+        "system": "observability",
+        "source": "monitoring",
+        "error_code": "E500",
+        "confidence": 0.8335175814366018,
+        "text_excerpt": "[observability] version mismatch (E500). alert triggered from monitoring. occurred right after deployment. pls fix asap"
+      },
+      {
+        "true": "P1",
+        "pred": "P0",
+        "timestamp": "2026-02-07T20:19:49Z",
+        "system": "billing",
+        "source": "oncall",
+        "error_code": "E503",
+        "confidence": 0.8134959710961084,
+        "text_excerpt": "[billing] version mismatch (E503). occurred right after deployment."
+      }
+    ],
+    "P1 \u2192 P2": [
+      {
+        "true": "P1",
+        "pred": "P2",
+        "timestamp": "2026-02-07T10:35:49Z",
+        "system": "auth",
+        "source": "partner",
+        "error_code": "DB_CONN",
+        "confidence": 0.8065908190819795,
+        "text_excerpt": "[auth] degraded (DB_CONN)."
+      },
+      {
+        "true": "P1",
+        "pred": "P2",
+        "timestamp": "2026-02-07T22:55:49Z",
+        "system": "search",
+        "source": "user_report",
+        "error_code": "E503",
+        "confidence": 0.8589811551205931,
+        "text_excerpt": "[search] p95 high (E503). user says app is broken. repro steps unknown"
+      },
+      {
+        "true": "P1",
+        "pred": "P2",
+        "timestamp": "2026-02-08T05:25:49Z",
+        "system": "billing",
+        "source": "partner",
+        "error_code": "E408",
+        "confidence": 0.8036294874883066,
+        "text_excerpt": "[billing] 500 spike (E408)."
+      }
+    ],
+    "P1 \u2192 P3": [
+      {
+        "true": "P1",
+        "pred": "P3",
+        "timestamp": "2026-02-07T08:14:49Z",
+        "system": "gateway",
+        "source": "batch_job",
+        "error_code": "E408",
+        "confidence": 0.8047522837037775,
+        "text_excerpt": "[gateway] config error (E408). occurred right after deployment."
+      },
+      {
+        "true": "P1",
+        "pred": "P3",
+        "timestamp": "2026-02-07T13:41:49Z",
+        "system": "mobile",
+        "source": "batch_job",
+        "error_code": "OOM",
+        "confidence": 0.8235696775521865,
+        "text_excerpt": "[mobile] 500 spike (OOM)."
+      },
+      {
+        "true": "P1",
+        "pred": "P3",
+        "timestamp": "2026-02-07T22:17:49Z",
+        "system": "billing",
+        "source": "monitoring",
+        "error_code": "E429",
+        "confidence": 0.8164864352625401,
+        "text_excerpt": "[billing] unauthorized (E429). alert triggered from monitoring."
+      }
+    ],
+    "P2 \u2192 P0": [
+      {
+        "true": "P2",
+        "pred": "P0",
+        "timestamp": "2026-02-08T00:14:49Z",
+        "system": "billing",
+        "source": "oncall",
+        "error_code": "E504",
+        "confidence": 0.8689361977989434,
+        "text_excerpt": "[billing] lag (E504). seen by customers"
+      },
+      {
+        "true": "P2",
+        "pred": "P0",
+        "timestamp": "2026-02-08T03:01:49Z",
+        "system": "observability",
+        "source": "batch_job",
+        "error_code": "TIMEOUT",
+        "confidence": 0.8440327336630791,
+        "text_excerpt": "[observability] lag (TIMEOUT)."
+      },
+      {
+        "true": "P2",
+        "pred": "P0",
+        "timestamp": "2026-02-08T04:36:49Z",
+        "system": "billing",
+        "source": "qa",
+        "error_code": "E403",
+        "confidence": 0.8579806089484545,
+        "text_excerpt": "[billing] incorrect data (E403). urgent"
+      }
+    ],
+    "P0 \u2192 P2": [
+      {
+        "true": "P0",
+        "pred": "P2",
+        "timestamp": "2026-02-07T22:04:49Z",
+        "system": "observability",
+        "source": "user_report",
+        "error_code": "E401",
+        "confidence": 0.8067851098400867,
+        "text_excerpt": "[observability] cannot reach (E401). user says app is broken. repro steps unknown"
+      },
+      {
+        "true": "P0",
+        "pred": "P2",
+        "timestamp": "2026-02-08T10:51:49Z",
+        "system": "inventory",
+        "source": "qa",
+        "error_code": "E403",
+        "confidence": 0.8559247863931484,
+        "text_excerpt": "[inventory] charge failed (E403)."
+      },
+      {
+        "true": "P0",
+        "pred": "P2",
+        "timestamp": "2026-02-08T12:38:49Z",
+        "system": "gateway",
+        "source": "qa",
+        "error_code": "E408",
+        "confidence": 0.839000965093804,
+        "text_excerpt": "[gateway] webhook failed (E408)."
+      }
+    ]
+  },
+  "classification_report": "              precision    recall  f1-score   support\n\n          P0      0.746     0.842     0.791       101\n          P1      0.944     0.781     0.855       196\n          P2      0.724     0.808     0.764        78\n          P3      0.541     0.800     0.645        25\n\n    accuracy                          0.802       400\n   macro avg      0.739     0.807     0.764       400\nweighted avg      0.826     0.802     0.808       400\n",
+  "log_loss": 0.7713944843734555,
+  "ece": 0.04010543499830438,
+  "calibration_bins": [
+    {
+      "bin_lo": 0.8,
+      "bin_hi": 0.9,
+      "count": 389,
+      "mean_conf": 0.8403079121672843,
+      "acc": 0.8046272493573264,
+      "frac": 0.9725
+    },
+    {
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "count": 11,
+      "mean_conf": 0.9238541969316496,
+      "acc": 0.7272727272727273,
+      "frac": 0.0275
+    }
+  ],
+  "severe_mistake_rate": 0.0775,
+  "p0_recall": 0.8415841584158416
+}

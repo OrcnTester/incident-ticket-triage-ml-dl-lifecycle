@@ -1,0 +1,19 @@
+{
+  "results": [
+    {
+      "id": "p1",
+      "response": "P0",
+      "score": 2
+    },
+    {
+      "id": "p2",
+      "response": "{\"category\": \"payment_issue\", \"priority\": \"P1\"}",
+      "score": 2
+    }
+  ],
+  "summary": {
+    "avg_score": 2.0,
+    "format_failures": 0,
+    "total_prompts": 2
+  }
+}

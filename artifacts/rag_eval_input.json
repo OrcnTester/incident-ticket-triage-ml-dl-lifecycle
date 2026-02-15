@@ -1,0 +1,12 @@
+[
+  {
+    "query": "API 5xx spike",
+    "gold_doc": "runbook_api_5xx",
+    "retrieved_docs": ["runbook_api_5xx", "ownership_payments"],
+    "retrieved_text": [
+  "When you see elevated 5xx: Check recent deployments (last 30-60 mins).",
+  "Service ownership info"
+],
+    "answer": "Check recent deployments. [runbook_api_5xx]"
+  }
+]
