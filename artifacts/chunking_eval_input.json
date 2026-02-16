@@ -1,0 +1,21 @@
+[
+  {
+    "query": "API 5xx spike",
+    "gold_doc": "runbook_api_5xx",
+    "retrieved_docs": ["runbook_api_5xx", "ownership_payments"],
+    "retrieved_text": [
+      "When you see elevated 5xx: check recent deployments (last 30-60 mins).",
+      "Verify error rate by endpoint and region. If P0 confirmed, page on-call."
+    ],
+    "answer": "Check recent deployments and upstream dependency latency. [runbook_api_5xx]"
+  },
+  {
+    "query": "Who owns payments checkout?",
+    "gold_doc": "ownership_payments",
+    "retrieved_docs": ["ownership_payments"],
+    "retrieved_text": [
+      "Service: payments-api. Owner: Team Payments. On-call: payments-oncall."
+    ],
+    "answer": "payments-api is owned by Team Payments. [ownership_payments]"
+  }
+]
