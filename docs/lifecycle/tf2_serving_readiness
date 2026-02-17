@@ -1,0 +1,54 @@
+# TensorFlow 2.x Integration & Model Serving Readiness
+
+This document formalizes the export, versioning, and serving workflow
+for TensorFlow 2.x (Keras) models in a production-oriented setup.
+
+------------------------------------------------------------------------
+
+## Objective
+
+Ensure models are:
+
+-   Serialized in SavedModel format
+-   Equipped with explicit serving signatures
+-   Installed into versioned TF Serving layout
+-   Smoke-tested via REST inference
+-   Deployment reproducible
+
+------------------------------------------------------------------------
+
+## Directory Layout
+
+src/serving/export_and_install_tfserving.py\
+docs/lifecycle/tf2_serving_readiness.md\
+artifacts/\
+models/`<model_name>`{=html}/`<version>`{=html}/
+
+------------------------------------------------------------------------
+
+## Serving Workflow
+
+### Step 1 --- Export
+
+python src/serving/export_and_install_tfserving.py
+
+### Step 2 --- Start TF Serving
+
+docker run -p 8501:8501 --mount
+type=bind,source=\$(pwd)/models/my_model,target=/models/my_model -e
+MODEL_NAME=my_model tensorflow/serving
+
+### Step 3 --- REST Predict
+
+curl -X POST http://localhost:8501/v1/models/my_model:predict -H
+"Content-Type: application/json" -d @artifacts/smoke_payload.json
+
+------------------------------------------------------------------------
+
+## Definition of Done
+
+-   SavedModel export successful
+-   serving_default signature defined
+-   Versioned layout installed
+-   Docker TF Serving runs locally
+-   REST inference returns predictions
